@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <title>Learning firebase - register or log in</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width, user-scalable=no" />
+        <link rel="stylesheet" href="style.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <h1>Firebase JS</h1>
+        </header>
+        <main>
+            <script type="text/javascript" async>
+                function showRegisterTab(){
+                    document.getElementById('registerForm').style.display = 'block';
+                    document.getElementById('loginForm').style.display = 'none';
+
+                    document.getElementById('registerTabButton').style.backgroundColor = '#ffffff21';
+                    document.getElementById('loginTabButton').style.backgroundColor = 'transparent';
+                }
+                
+                function showLoginTab(){
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+
+                    document.getElementById('registerTabButton').style.backgroundColor = 'transparent';
+                    document.getElementById('loginTabButton').style.backgroundColor = '#ffffff21';
+                }
+                </script>
+            <button class="tabButton" id="registerTabButton" onclick="showRegisterTab()">Register</button>
+            <button class="tabButton" id="loginTabButton" onclick="showLoginTab()">Log in</button>
+            <form class="register" id="registerForm">
+                <br>
+                <!-- <input type="button" name="googleSignin" value="Sign in with Google &rarr;" id="registerGoogleSignin" /> -->
+                <button id="registerGoogleSignin">
+                    Sign in with Google
+                    <span class="material-icons" style="font-size: 1em;">login</span>
+                </button>
+                <br>
+                <br>
+                <hr style="border-left: none; border-right: none; border-top: none;">
+                <p>Email address</p>
+                <input type="email" name="email" id="registerEmail" placeholder="example@gmail.com" required />
+                <br>
+                <p>Username</p>
+                <input type="text" name="username" id="registerUsername" placeholder="username" required />
+                <br>
+                <p>First name</p>
+                <input type="text" name="firstname" id="registerFirstname" placeholder="First" required />
+                <br>
+                <p>Last name</p>
+                <input type="text" name="lastname" id="registerLastname" placeholder="Last" required />
+                <br>
+                <p>Password</p>
+                <input type="password" name="password" id="registerPassword" placeholder="*SuperStrongPassword*" required />
+                <br>
+                <p>Repeat password</p>
+                <input type="password" name="repeatPassword" id="registerRepeatPassword" placeholder="*SuperStrongPassword*" required />
+                <br>
+                <p>
+                    <input type="checkbox" name="acceptTerms" id="registerAcceptTerms" required />
+                    I accept the <a href="terms-and-conditions.html">terms and conditions</a> of using this service.
+                </p>
+                <br>
+                <input type="button" name="register" value="Register" id="registerSubmit" />
+            </form>
+            <form class="login" id="loginForm">
+                <br>
+                <button id="loginGoogleSignin">
+                    Sign in with Google
+                    <span class="material-icons" style="font-size: 1em;">login</span>
+                </button>
+                <br>
+                <br>
+                <hr style="border-left: none; border-right: none; border-top: none;">
+                <p>Email address</p>
+                <input type="email" name="email" id="loginEmail" placeholder="example@gmail.com" required />
+                <br>
+                <p>Password</p>
+                <input type="password" name="password" id="loginPassword" placeholder="YourStrongPassword" required />
+                <br>
+                <br>
+                <input type="button" name="login" value="Log in" id="loginSubmit" />
+            </form>
+        </main>
+        <footer>
+            <p>Copyright &copy; 2022</p>
+        </footer>
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-analytics.js";
+            import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+            import { getFirestore, addDoc, collection, query, where } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js";
+            // https://firebase.google.com/docs/web/setup#available-libraries
+          
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+              apiKey: "AIzaSyC20Fn3rp0ZwX6QRgtio74Rx6w_aL5CxCA",
+              authDomain: "learning-firebase-aa839.firebaseapp.com",
+              projectId: "learning-firebase-aa839",
+              storageBucket: "learning-firebase-aa839.appspot.com",
+              messagingSenderId: "371626302508",
+              appId: "1:371626302508:web:7ed2cca57bd7cca6bac589",
+              measurementId: "G-3MM38T2V3J"
+            };
+          
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const auth = getAuth(app);
+            const provider = new GoogleAuthProvider();
+            const db = getFirestore(app);
+
+
+            // function createUserData(email, firstname, lastname, username){
+            function createUserData(email, displayName, photoURL, uid){
+                try {
+                    const docRef = addDoc(collection(db, "users"), {
+                        email: email,
+                        displayName: displayName,
+                        photoURL: photoURL,
+                        uid: uid,
+                        lastlogin: Date.now()
+                    }).then(() => {
+                        alert("then");
+                        console.log("Document written with ID: ", docRef.id);
+                    });
+                    alert("Userdata created");
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                    alert(e);
+                }
+            }
+
+            function checkIfUserDataExists(uid){
+                // const q = query(collection(db, "users"), where("uid", "==", toString(uid)))
+                //     .then(() => {
+                //         return(true);
+                //     })
+                //     .catch((error) => {
+                //         return(false);
+                //     });
+
+                const usersRef = collection(db, "users");
+
+                // Create a query against the collection.
+                const q = query(usersRef, where("uid", "==", uid));
+            }
+
+            function googleSignIn(){
+                signInWithPopup(auth, provider)
+                    .then((result) => {
+                        // This gives you a Google Access Token. You can use it to access the Google API.
+                        const credential = GoogleAuthProvider.credentialFromResult(result);
+                        const token = credential.accessToken;
+                        // The signed-in user info.
+                        const user = result.user;
+                        if(checkIfUserDataExists(user.uid)){
+                            createUserData(user.email, user.displayName, user.photoURL, user.uid);
+                        }
+                        window.location.replace('./deals.html');
+                    }).catch((error) => {
+                        // Handle Errors here.
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        // The AuthCredential type that was used.
+                        const credential = GoogleAuthProvider.credentialFromError(error);
+                        alert(errorMessage);
+                    });
+            }
+
+            document.getElementById('registerGoogleSignin').addEventListener('click', (e) => {
+                googleSignIn();
+            });
+
+            const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+            document.getElementById('registerSubmit').addEventListener('click', (e) => {
+                let email = document.getElementById('registerEmail').value;
+                let username = document.getElementById('registerUsername').value;
+                let firstname = document.getElementById('registerFirstname').value;
+                let lastname = document.getElementById('registerLastname').value;
+                let password = document.getElementById('registerPassword').value;
+                let repeatPassword = document.getElementById('registerRepeatPassword').value;
+                let acceptTerms = document.getElementById('registerAcceptTerms').checked;
+
+                if(!(emailRegex.test(email))){
+                    alert("Email invalid");
+                    return;
+                }
+
+                if(password.length < 6){
+                    alert("Password is too short");
+                    return;
+                }
+
+                if(password != repeatPassword){
+                    alert("Passwords dont match");
+                    return;
+                }
+
+                if(acceptTerms != true){
+                    alert("Please accept the terms and conditions");
+                    return;
+                }
+
+                createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    let photoURL = 'profilePics/' + user.uid + '.extension';
+
+                    createUserData(email, username, photoURL, user.uid);
+
+                    signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        // Signed in 
+                        const user = userCredential.user;
+                        window.location.replace('./deals.html');
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        alert(errorMessage);
+                    });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+
+                    alert(errorMessage);
+                });
+            });
+
+            document.getElementById('loginGoogleSignin').addEventListener('click', (e) => {
+                // signInWithPopup(auth, provider)
+                // .then((userCredentials) => {
+                //     const user = userCredentials.user;
+                //     window.location.replace('./deals.html');
+                // })
+                // .catch((error) => {
+                //     const errorCode = error.code;
+                //     const errorMessage = error.message;
+                //     alert(errorMessage);
+                // });
+
+                // signInWithPopup(auth, provider)
+                //     .then((result) => {
+                //         // This gives you a Google Access Token. You can use it to access the Google API.
+                //         const credential = GoogleAuthProvider.credentialFromResult(result);
+                //         const token = credential.accessToken;
+                //         // The signed-in user info.
+                //         const user = result.user;
+                //         checkIfUserDataExists(user.uid);
+                //         createUserData(user.email, user.displayName, user.photoURL, user.uid);
+                //         window.location.replace('./deals.html');
+                //     }).catch((error) => {
+                //         // Handle Errors here.
+                //         const errorCode = error.code;
+                //         const errorMessage = error.message;
+                //         // The AuthCredential type that was used.
+                //         const credential = GoogleAuthProvider.credentialFromError(error);
+                //         alert(errorMessage);
+                //     });
+                googleSignIn();
+            });
+
+            document.getElementById('loginSubmit').addEventListener('click', (e) => {
+                let email = document.getElementById('loginEmail').value;
+                let password = document.getElementById('loginPassword').value;
+
+                if(!(emailRegex.test(email))){
+                    alert('Email address is invalid.');
+                    return;
+                }
+
+                signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    window.location.replace('./deals.html');
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    alert(errorMessage);
+                });
+            });
+        </script>
+    </body>
+</html>

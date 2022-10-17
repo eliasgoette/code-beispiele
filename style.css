@@ -1,0 +1,68 @@
+html{
+    color: white;
+    background-color: gray;
+}
+
+button, input, .carBrandSelect{
+    color: white;
+    background-color: transparent;
+    border: 2px solid currentColor;
+    border-radius: 5px;
+}
+
+button{
+    padding: 0.3em;
+    padding-top: 0.5em;
+}
+
+::placeholder{
+    color: lightgray;
+}
+
+.tabButton{
+    border-bottom: none;
+}
+
+#registerTabButton{
+    background-color: #ffffff21;
+    border-radius: 5px 5px 0 0;
+}
+
+#loginTabButton{
+    border-radius: 5px 5px 0 0;
+}
+
+form.register, form.login{
+    border: 2px solid white;
+    border-radius: 0 10px 20px 20px;
+    padding:  0 20px 20px 20px;
+    min-height: 60px;
+}
+
+.register{
+    display: block;
+}
+
+.login{
+    display: none;
+}
+
+div.profileIcon{
+    width: 2.1em;
+    height: 2.1em;
+    border: 2px solid white;
+    border-radius: 50%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#profileIconPhoto{
+    /* width: 200px;
+    height: 200px; */
+}
+
+img.profileIcon{
+    width: 2.1em;
+    height: 2.1em;
+    border-radius: 50%;
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <title>Learning firebase</title>
+        <meta name="viewport" content="initial-scale=1, width=device-width, user-scalable=no" />
+        <link rel="stylesheet" href="style.css" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <header>
+            <h1>Firebase JS</h1>
+            <p>
+                Logged in as 
+                <span id="loggedinUser"></span>
+                <div class="profileIcon">
+                    <span id="profileIconPlaceholder" class="material-icons md-light" style="font-size: 2em;">person_outline</span>
+                    <span id="profileIconSpan"></span>
+                </div>
+            </p>
+            <button id="logoutButton">
+                Log out 
+                <span class="material-icons" style="font-size: 1em;">logout</span>
+            </button>
+        </header>
+        <main>
+            <p>Placeholder for trading deals</p>
+        </main>
+        <footer>
+            <p>Copyright &copy; 2022</p>
+        </footer>
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-analytics.js";
+            import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-auth.js";
+            import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-firestore.js";
+
+            // https://firebase.google.com/docs/web/setup#available-libraries
+          
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+              apiKey: "AIzaSyC20Fn3rp0ZwX6QRgtio74Rx6w_aL5CxCA",
+              authDomain: "learning-firebase-aa839.firebaseapp.com",
+              projectId: "learning-firebase-aa839",
+              storageBucket: "learning-firebase-aa839.appspot.com",
+              messagingSenderId: "371626302508",
+              appId: "1:371626302508:web:7ed2cca57bd7cca6bac589",
+              measurementId: "G-3MM38T2V3J"
+            };
+          
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in, see docs for a list of available properties
+                    // https://firebase.google.com/docs/reference/js/firebase.User
+                    const uid = user.uid;
+
+                    const q = query(collection(db, "users"), where("uid", "==", user.uid));
+
+                    const querySnapshot = getDocs(q).then(
+                        (querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                // doc.data() is never undefined for query doc snapshots
+                                console.log(doc.id, " => ", doc.data());
+                                document.getElementById('loggedinUser').innerText = doc.data()["displayName"];
+
+                                let profileIconSrc = doc.data()["photoURL"];
+                                try {
+                                    document.getElementById("profileIconSpan").innerHTML = "<img src='" + profileIconSrc + "' class='profileIcon' />";
+                                    document.getElementById("profileIconPlaceholder").style.display = 'none';
+                                } catch (error) {
+                                    document.getElementById("profileIconPlaceholder").style.display = 'block';
+                                }
+                            });
+                        }
+                    );
+
+                } else {
+                    // User is signed out
+                    window.location.replace('./index.html');
+                }
+            });
+
+            document.getElementById('logoutButton').addEventListener('click', () => {
+                signOut(auth).then(() => {
+                window.location.replace('./index.html');
+                }).catch((error) => {
+                // An error happened.
+                });
+            });
+        </script>
+    </body>
+</html>
